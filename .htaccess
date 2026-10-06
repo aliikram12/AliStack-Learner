@@ -1,0 +1,16 @@
+# AliStack Learner - Root Apache Configuration
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Prevent loop if request already contains /public/
+    RewriteCond %{REQUEST_URI} /public/ [NC]
+    RewriteRule ^ - [L]
+
+    # Forward root directory request to public/
+    RewriteRule ^$ public/ [L]
+
+    # Forward other requests to public/ if not existing
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
