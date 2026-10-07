@@ -106,11 +106,40 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
      data-course-id="<?= $courseId ?>" 
      data-lesson-id="<?= $currentLessonId ?>"></div>
 
+<!-- Learning Top Bar -->
+<div style="background: #111827; border-bottom: 1px solid #1F2937; padding: 10px 24px; display: flex; align-items: center; justify-content: space-between; color: #FFFFFF;">
+    <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="<?= baseUrl('course-details.php?slug=' . $course['slug']) ?>" class="btn btn-ghost btn-sm" style="color: #94A3B8; padding: 6px 10px;">
+            <i class="bi bi-arrow-left"></i> Course Overview
+        </a>
+        <div style="height: 16px; width: 1px; background: #374151;"></div>
+        <div>
+            <div style="font-size: 11px; text-transform: uppercase; color: #94A3B8; font-weight: 700; letter-spacing: 0.05em;">FOCUSED LEARNING</div>
+            <div style="font-family: var(--font-heading); font-size: 14px; font-weight: 700; color: #FFFFFF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 480px;">
+                <?= Sanitizer::e($course['title']) ?>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 18px;">
+        <div style="display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: #94A3B8;">
+            <span>Progress: <strong style="color: #60A5FA;"><?= number_format((float)$enrollment['progress_percent'], 0) ?>%</strong></span>
+            <div class="progress-bar" style="width: 100px; height: 6px; background: #374151;">
+                <div class="progress-fill" style="width: <?= (float)$enrollment['progress_percent'] ?>%;"></div>
+            </div>
+        </div>
+
+        <button type="button" id="topAiLaunchBtn" class="btn btn-secondary btn-sm" style="background: linear-gradient(135deg, #2563EB, #7C3AED); border: none; padding: 6px 14px;">
+            <i class="bi bi-stars"></i> Ask AliStack AI
+        </button>
+    </div>
+</div>
+
 <div class="player-layout">
     <!-- Main Left Area: Video Player & Details -->
     <div class="player-main-area">
-        <!-- Video Container -->
-        <div class="video-container">
+        <!-- 16:9 Video Container with Rounded Borders -->
+        <div class="video-container" style="background: #000000; overflow: hidden;">
             <div id="youtubePlayer" 
                  data-video-id="<?= Sanitizer::e($currentLesson['youtube_video_id']) ?>" 
                  data-start-pos="<?= $startPos ?>"></div>
@@ -121,28 +150,34 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
             <div class="lesson-nav-buttons">
                 <?php if ($prevLesson): ?>
                     <a href="<?= baseUrl("learning.php?course_id={$courseId}&lesson_id={$prevLesson['id']}") ?>" class="btn-player">
-                        <i class="bi bi-chevron-left"></i> Previous
+                        <i class="bi bi-arrow-left"></i> Previous
                     </a>
                 <?php else: ?>
-                    <button class="btn-player" disabled><i class="bi bi-chevron-left"></i> Previous</button>
+                    <button class="btn-player" disabled><i class="bi bi-arrow-left"></i> Previous</button>
                 <?php endif; ?>
 
+                <button type="button" id="markCompleteBtn" class="btn-player <?= $isCompleted ? 'btn-complete' : '' ?>">
+                    <i class="bi <?= $isCompleted ? 'bi-check-circle-fill' : 'bi-check2' ?>"></i> 
+                    <?= $isCompleted ? 'Completed' : 'Mark Complete' ?>
+                </button>
+
                 <?php if ($nextLesson): ?>
-                    <a href="<?= baseUrl("learning.php?course_id={$courseId}&lesson_id={$nextLesson['id']}") ?>" class="btn-player">
-                        Next <i class="bi bi-chevron-right"></i>
+                    <a href="<?= baseUrl("learning.php?course_id={$courseId}&lesson_id={$nextLesson['id']}") ?>" class="btn btn-primary btn-sm" style="padding: 8px 16px;">
+                        Next Lesson <i class="bi bi-arrow-right"></i>
                     </a>
+                <?php else: ?>
+                    <?php if ($assessment): ?>
+                        <a href="<?= baseUrl("assessment.php?course_id={$courseId}") ?>" class="btn btn-secondary btn-sm" style="padding: 8px 16px;">
+                            Final Assessment <i class="bi bi-award-fill"></i>
+                        </a>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
 
             <div style="display: flex; gap: 12px; align-items: center;">
                 <button type="button" id="bookmarkBtn" class="btn-player <?= $isBookmarked ? 'btn-bookmarked' : '' ?>">
                     <i class="bi <?= $isBookmarked ? 'bi-bookmark-fill' : 'bi-bookmark' ?>"></i> 
-                    <?= $isBookmarked ? 'Bookmarked' : 'Bookmark' ?>
-                </button>
-
-                <button type="button" id="markCompleteBtn" class="btn-player <?= $isCompleted ? 'btn-complete' : '' ?>">
-                    <i class="bi <?= $isCompleted ? 'bi-check-circle-fill' : 'bi-check2' ?>"></i> 
-                    <?= $isCompleted ? 'Completed' : 'Mark Complete' ?>
+                    <?= $isBookmarked ? 'Saved' : 'Bookmark' ?>
                 </button>
             </div>
         </div>
@@ -151,8 +186,8 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
         <div class="player-details-area">
             <div class="player-lesson-header">
                 <div>
-                    <div style="font-size: 13px; color: var(--muted); margin-bottom: 4px;">
-                        Lesson <?= $currentIndex + 1 ?> of <?= count($lessons) ?> &bull; <?= Sanitizer::e($course['title']) ?>
+                    <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 4px; font-weight: 500;">
+                        Lesson <?= $currentIndex + 1 ?> of <?= count($lessons) ?> &bull; Estimated Duration: <?= (int)$currentLesson['duration_minutes'] ?> mins
                     </div>
                     <h1 class="player-lesson-title"><?= Sanitizer::e($currentLesson['title']) ?></h1>
                 </div>
@@ -165,64 +200,67 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
             </div>
 
             <div class="player-tabs">
-                <button type="button" class="player-tab-btn active" data-tab="notes">
-                    <i class="bi bi-pencil-square"></i> My Lesson Notes
+                <button type="button" class="player-tab-btn active" data-tab="overview">
+                    <i class="bi bi-card-text"></i> Overview
                 </button>
-                <button type="button" class="player-tab-btn" data-tab="overview">
-                    <i class="bi bi-card-text"></i> Lesson Overview
+                <button type="button" class="player-tab-btn" data-tab="notes">
+                    <i class="bi bi-pencil-square"></i> My Notes
                 </button>
                 <button type="button" class="player-tab-btn" data-tab="resources">
                     <i class="bi bi-folder2-open"></i> Resources (<?= count($resources) ?>)
                 </button>
             </div>
 
-            <!-- Tab: Notes -->
-            <div class="player-tab-pane active" id="tab-notes">
-                <div class="notes-editor-wrap">
-                    <div class="notes-header">
-                        <strong style="font-size: 14px; color: var(--dark);"><i class="bi bi-journal-text"></i> Personal Notes for This Lesson</strong>
-                        <span class="notes-status" id="notesStatus">Autosave enabled</span>
-                    </div>
-                    <textarea id="lessonNotesText" class="notes-textarea" placeholder="Take personal notes, code snippets, or key takeaways here. Changes will autosave automatically..."><?= Sanitizer::e($note['content'] ?? '') ?></textarea>
-                </div>
-            </div>
-
             <!-- Tab: Overview -->
-            <div class="player-tab-pane" id="tab-overview">
+            <div class="player-tab-pane active" id="tab-overview">
                 <div class="card" style="padding: 24px;">
-                    <h4 style="margin-bottom: 12px;">Lesson Description</h4>
-                    <p style="line-height: 1.7; font-size: 14px;">
+                    <h4 style="margin-bottom: 12px; font-size: 1.05rem;">Lesson Description</h4>
+                    <p style="line-height: 1.7; font-size: 14px; color: var(--text-main);">
                         <?= nl2br(Sanitizer::e($currentLesson['description'] ?? 'No additional description provided for this lesson.')) ?>
                     </p>
 
                     <?php if (!empty($currentLesson['learning_objectives'])): ?>
-                        <h4 style="margin-top: 24px; margin-bottom: 12px;">Key Objectives</h4>
-                        <div style="font-size: 14px; color: var(--muted); line-height: 1.6;">
+                        <h4 style="margin-top: 24px; margin-bottom: 12px; font-size: 1.05rem;">Learning Objectives</h4>
+                        <div style="font-size: 14px; color: var(--text-main); line-height: 1.6; background: var(--bg-main); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border);">
                             <?= nl2br(Sanitizer::e($currentLesson['learning_objectives'])) ?>
                         </div>
                     <?php endif; ?>
                 </div>
             </div>
 
+            <!-- Tab: Notes -->
+            <div class="player-tab-pane" id="tab-notes">
+                <div class="notes-editor-wrap">
+                    <div class="notes-header">
+                        <strong style="font-size: 14px; color: var(--text-dark);"><i class="bi bi-journal-text"></i> Personal Notes for This Lesson</strong>
+                        <span class="notes-status" id="notesStatus"><i class="bi bi-cloud-check"></i> Autosave active</span>
+                    </div>
+                    <textarea id="lessonNotesText" class="notes-textarea" placeholder="Take personal notes, code snippets, or key takeaways here. Changes autosave automatically as you type..."><?= Sanitizer::e($note['content'] ?? '') ?></textarea>
+                </div>
+            </div>
+
             <!-- Tab: Resources -->
             <div class="player-tab-pane" id="tab-resources">
                 <div class="card" style="padding: 24px;">
-                    <h4 style="margin-bottom: 16px;">Downloadable Resources & Links</h4>
+                    <h4 style="margin-bottom: 16px; font-size: 1.05rem;">Downloadable Resources & Reference Links</h4>
                     <?php if (empty($resources)): ?>
-                        <p style="font-size: 13px; color: var(--muted); margin: 0;">No downloadable supplementary files attached to this lesson.</p>
+                        <div class="empty-state" style="padding: 32px 20px;">
+                            <i class="bi bi-folder" style="font-size: 2rem; color: var(--text-light); margin-bottom: 8px; display: block;"></i>
+                            <div style="font-size: 13.5px; color: var(--text-muted);">No downloadable supplementary files attached to this lesson.</div>
+                        </div>
                     <?php else: ?>
                         <div style="display: flex; flex-direction: column; gap: 12px;">
                             <?php foreach ($resources as $res): ?>
-                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #F8FAFC; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--bg-main); border-radius: var(--radius-md); border: 1px solid var(--border);">
                                     <div style="display: flex; align-items: center; gap: 12px;">
-                                        <i class="bi bi-file-earmark-arrow-down-fill" style="font-size: 20px; color: var(--primary);"></i>
+                                        <i class="bi bi-file-earmark-arrow-down-fill" style="font-size: 22px; color: var(--primary);"></i>
                                         <div>
-                                            <div style="font-weight: 600; font-size: 14px;"><?= Sanitizer::e($res['title']) ?></div>
-                                            <div style="font-size: 11px; color: var(--muted);"><?= strtoupper(Sanitizer::e($res['file_type'])) ?> &bull; <?= round($res['file_size'] / 1024) ?> KB</div>
+                                            <div style="font-weight: 600; font-size: 14px; color: var(--text-dark);"><?= Sanitizer::e($res['title']) ?></div>
+                                            <div style="font-size: 11.5px; color: var(--text-muted);"><?= strtoupper(Sanitizer::e($res['file_type'])) ?> &bull; <?= round($res['file_size'] / 1024) ?> KB</div>
                                         </div>
                                     </div>
                                     <a href="<?= baseUrl($res['file_path']) ?>" download class="btn btn-outline btn-sm">
-                                        Download
+                                        <i class="bi bi-download"></i> Download
                                     </a>
                                 </div>
                             <?php endforeach; ?>
@@ -241,8 +279,8 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
                 <span>Course Progress: <?= number_format((float)$enrollment['progress_percent'], 0) ?>%</span>
                 <span><?= count($lessons) ?> Lessons</span>
             </div>
-            <div class="course-progress-bar">
-                <div class="course-progress-fill" style="width: <?= (float)$enrollment['progress_percent'] ?>%;"></div>
+            <div class="progress-bar" style="height: 6px; margin-top: 8px;">
+                <div class="progress-fill" style="width: <?= (float)$enrollment['progress_percent'] ?>%;"></div>
             </div>
         </div>
 
@@ -271,15 +309,15 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
             <?php endforeach; ?>
 
             <?php if ($assessment): ?>
-                <li style="padding: 16px 20px; background: #F8FAFC; border-top: 1px solid var(--border-color);">
-                    <div style="font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 4px;">FINAL TEST</div>
-                    <div style="font-size: 14px; font-weight: 600; color: var(--dark); margin-bottom: 8px;"><?= Sanitizer::e($assessment['title']) ?></div>
+                <li style="padding: 18px 20px; background: #F8FAFC; border-top: 1px solid var(--border);">
+                    <div style="font-size: 11px; font-weight: 700; color: var(--primary); text-transform: uppercase; margin-bottom: 4px; letter-spacing: 0.05em;">FINAL EXAMINATION</div>
+                    <div style="font-size: 14px; font-weight: 700; color: var(--text-dark); margin-bottom: 8px;"><?= Sanitizer::e($assessment['title']) ?></div>
                     <?php if ((float)$enrollment['progress_percent'] >= 100.0): ?>
                         <a href="<?= baseUrl("assessment.php?course_id={$courseId}") ?>" class="btn btn-primary btn-sm" style="width: 100%;">
-                            Start Assessment
+                            <i class="bi bi-award-fill"></i> Launch Assessment
                         </a>
                     <?php else: ?>
-                        <div style="font-size: 12px; color: var(--muted);">Complete 100% of lessons to unlock test.</div>
+                        <div style="font-size: 12px; color: var(--text-muted);"><i class="bi bi-lock-fill"></i> Complete 100% of lessons to unlock assessment.</div>
                     <?php endif; ?>
                 </li>
             <?php endif; ?>
@@ -290,7 +328,7 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
 <!-- Floating AI Tutor Launcher -->
 <div class="ai-tutor-launcher">
     <div class="ai-tooltip">Ask AliStack AI</div>
-    <button type="button" class="ai-launch-btn" id="aiLaunchBtn" title="Ask AliStack AI Tutor">
+    <button type="button" class="ai-launch-btn" id="aiLaunchBtn" title="Ask AliStack AI Tutor" aria-label="Ask AliStack AI Tutor">
         <i class="bi bi-stars"></i>
     </button>
 </div>
@@ -300,11 +338,11 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
     <div class="ai-drawer-header">
         <div class="ai-header-info">
             <div class="ai-bot-avatar">
-                <i class="bi bi-robot"></i>
+                <i class="bi bi-stars"></i>
             </div>
             <div>
                 <div class="ai-header-title">AliStack AI Tutor</div>
-                <div class="ai-header-subtitle">Powered by AgentRouter</div>
+                <div class="ai-header-subtitle">Context-Aware Learning Mentor</div>
             </div>
         </div>
 
@@ -329,8 +367,8 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
         <button type="button" class="quick-action-btn" data-prompt="Is lesson ka concept aasan Roman Urdu mein samjhayein.">
             <i class="bi bi-chat-quote"></i> Roman Urdu
         </button>
-        <button type="button" class="quick-action-btn" data-prompt="Give me a code example demonstrating how to implement this correctly.">
-            <i class="bi bi-code-slash"></i> Give Example
+        <button type="button" class="quick-action-btn" data-prompt="Give me a clean code example demonstrating how to implement this.">
+            <i class="bi bi-code-slash"></i> Code Example
         </button>
         <button type="button" class="quick-action-btn" data-prompt="Ask me a practice question about this lesson to test my understanding.">
             <i class="bi bi-patch-question"></i> Practice Quiz
@@ -341,7 +379,7 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
     <div class="ai-chat-body" id="aiChatBody">
         <div class="ai-message assistant">
             <div class="msg-bubble">
-                Hello <strong><?= Sanitizer::e(explode(' ', $user['full_name'])[0]) ?></strong>! I am your <strong>AliStack AI Tutor</strong>. I am following along with <em><?= Sanitizer::e($currentLesson['title']) ?></em>. Ask me any conceptual question, request a code explanation, or click any quick action above!
+                Hello <strong><?= Sanitizer::e(explode(' ', $user['full_name'])[0]) ?></strong>! I am your <strong>AliStack AI Tutor</strong>. I am following along with <em><?= Sanitizer::e($currentLesson['title']) ?></em>. Ask me any question, request code debugging, or pick a quick action above!
             </div>
         </div>
     </div>
@@ -363,5 +401,12 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
         </form>
     </div>
 </div>
+
+<script>
+    // Link top bar AI button to AI launcher
+    document.getElementById('topAiLaunchBtn')?.addEventListener('click', () => {
+        document.getElementById('aiLaunchBtn')?.click();
+    });
+</script>
 
 <?php require_once dirname(__DIR__) . '/templates/layouts/footer.php'; ?>

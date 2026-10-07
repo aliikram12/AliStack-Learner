@@ -18,6 +18,10 @@ class Csrf {
         return $_SESSION['csrf_token'];
     }
 
+    public static function token(): string {
+        return self::getToken();
+    }
+
     public static function field(): string {
         $token = self::getToken();
         return '<input type="hidden" name="csrf_token" value="' . htmlspecialchars($token, ENT_QUOTES, 'UTF-8') . '">';

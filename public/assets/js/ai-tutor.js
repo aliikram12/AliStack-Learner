@@ -81,7 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentNotes = document.getElementById('lessonNotesText')?.value || '';
 
         try {
-            const res = await fetch('/api/ai/chat.php', {
+            const aiEndpoint = (typeof window.getApiUrl === 'function') 
+                ? window.getApiUrl('api/ai/chat.php') 
+                : '/api/ai/chat.php';
+            const res = await fetch(aiEndpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

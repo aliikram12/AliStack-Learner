@@ -123,7 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         try {
-            const res = await fetch('/api/assessments/submit.php', {
+            const endpoint = (typeof window.getApiUrl === 'function') 
+                ? window.getApiUrl('api/assessments/submit.php') 
+                : '/api/assessments/submit.php';
+            const res = await fetch(endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

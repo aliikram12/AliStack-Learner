@@ -27,177 +27,272 @@ $bookmarks = $courseRepo->getUserBookmarks($userId);
 $certificates = $certRepo->getUserCertificates($userId);
 $achievements = $certRepo->getUserAchievements($userId);
 
+// Compute real metric counts
+$inProgressCount = 0;
+$completedCount = 0;
+$totalHoursEstimated = 0.0;
+
+foreach ($enrollments as $e) {
+    if ((float)$e['progress_percent'] >= 100.0) {
+        $completedCount++;
+    } else {
+        $inProgressCount++;
+    }
+    // Estimate hours from completed lessons
+    $totalHoursEstimated += ((int)$e['completed_lessons'] * 15) / 60.0;
+}
+
 // Primary "Continue Learning" course
 $continueCourse = !empty($enrollments) ? $enrollments[0] : null;
 
 // Recommended courses (published courses user is not yet enrolled in)
 $allCourses = $courseRepo->getAllPublished();
 $enrolledCourseIds = array_map(fn($e) => (int)$e['course_id'], $enrollments);
-$recommendedCourses = array_filter($allCourses, fn($c) => !in_array((int)$c['id'], $enrolledCourseIds, true));
+$recommendedCourses = array_values(array_filter($allCourses, fn($c) => !in_array((int)$c['id'], $enrolledCourseIds, true)));
+
+// Dynamic Time-of-Day Greeting
+$hour = (int)date('H');
+if ($hour < 12) {
+    $timeGreeting = 'Good morning';
+} elseif ($hour < 17) {
+    $timeGreeting = 'Good afternoon';
+} else {
+    $timeGreeting = 'Good evening';
+}
+
+$firstName = Sanitizer::e(explode(' ', $user['full_name'])[0]);
 
 $pageTitle = 'Student Dashboard';
 require_once dirname(__DIR__) . '/templates/layouts/header.php';
 ?>
 
 <div class="container" style="padding: 40px 24px 80px;">
-    <!-- Welcome Banner -->
-    <div style="background: linear-gradient(135deg, #1E293B, #0F172A); border-radius: var(--radius-lg); padding: 36px 40px; color: #FFFFFF; margin-bottom: 36px; display: flex; align-items: center; justify-content: space-between; flex-wrap: gap; box-shadow: var(--shadow-lg);">
+    <!-- Top Greeting Section -->
+    <div style="display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 24px; margin-bottom: 36px;" class="hero-anim">
         <div>
-            <div style="display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; background: rgba(37,99,235,0.3); color: #93C5FD; padding: 4px 12px; border-radius: var(--radius-full); margin-bottom: 12px;">
-                <i class="bi bi-mortarboard-fill"></i> STUDENT PORTAL
+            <div style="font-size: 14px; font-weight: 600; color: var(--primary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 4px;">
+                <?= $timeGreeting ?>, <?= $firstName ?>
             </div>
-            <h1 style="color: #FFFFFF; font-size: 2.2rem; margin-bottom: 8px;">
-                Welcome back, <?= Sanitizer::e(explode(' ', $user['full_name'])[0]) ?>!
+            <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--text-dark); margin-bottom: 8px;">
+                Ready to continue learning?
             </h1>
-            <p style="color: #94A3B8; font-size: 15px; margin: 0; max-width: 580px;">
-                Track your structured video progress, review personal notes, ask your AI Tutor, and earn verified certificates.
+            <p style="font-size: 15px; color: var(--text-muted); max-width: 580px; margin: 0;">
+                Pick up where you left off or explore something new in your distraction-reduced classroom.
             </p>
         </div>
 
-        <div style="display: flex; gap: 24px; text-align: center;">
-            <div style="background: rgba(255,255,255,0.06); padding: 16px 24px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.1);">
-                <div style="font-size: 28px; font-weight: 800; color: #38BDF8;"><?= count($enrollments) ?></div>
-                <div style="font-size: 12px; color: #94A3B8; text-transform: uppercase;">Enrolled</div>
+        <div style="display: flex; gap: 12px; align-items: center;">
+            <?php if ($continueCourse): ?>
+                <a href="<?= baseUrl('learning.php?course_id=' . $continueCourse['course_id'] . (!empty($continueCourse['last_lesson_id']) ? '&lesson_id=' . $continueCourse['last_lesson_id'] : '')) ?>" class="btn btn-primary btn-lg">
+                    <i class="bi bi-play-circle-fill"></i> Continue Learning
+                </a>
+            <?php else: ?>
+                <a href="<?= baseUrl('courses.php') ?>" class="btn btn-primary btn-lg">
+                    <i class="bi bi-collection-play-fill"></i> Start First Course
+                </a>
+            <?php endif; ?>
+            <a href="<?= baseUrl('courses.php') ?>" class="btn btn-outline btn-lg">
+                <i class="bi bi-compass"></i> Explore Courses
+            </a>
+        </div>
+    </div>
+
+    <!-- Learning Overview Stats Cards -->
+    <div style="margin-bottom: 40px;">
+        <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-dark); margin-bottom: 18px;">Learning Overview</h2>
+        <div class="grid grid-4">
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-blue">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+                <div>
+                    <div class="stat-value"><?= $inProgressCount ?></div>
+                    <div class="stat-label">Courses in Progress</div>
+                </div>
             </div>
-            <div style="background: rgba(255,255,255,0.06); padding: 16px 24px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.1);">
-                <div style="font-size: 28px; font-weight: 800; color: #4ADE80;"><?= count($certificates) ?></div>
-                <div style="font-size: 12px; color: #94A3B8; text-transform: uppercase;">Certificates</div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-emerald">
+                    <i class="bi bi-check2-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-value"><?= $completedCount ?></div>
+                    <div class="stat-label">Courses Completed</div>
+                </div>
             </div>
-            <div style="background: rgba(255,255,255,0.06); padding: 16px 24px; border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.1);">
-                <div style="font-size: 28px; font-weight: 800; color: #FBBF24;"><?= count($achievements) ?></div>
-                <div style="font-size: 12px; color: #94A3B8; text-transform: uppercase;">Badges</div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-purple">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+                <div>
+                    <div class="stat-value"><?= number_format($totalHoursEstimated, 1) ?>h</div>
+                    <div class="stat-label">Estimated Study Time</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon stat-icon-amber">
+                    <i class="bi bi-award-fill"></i>
+                </div>
+                <div>
+                    <div class="stat-value"><?= count($certificates) ?></div>
+                    <div class="stat-label">Verified Certificates</div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Continue Learning Section -->
     <?php if ($continueCourse): ?>
-        <div class="card" style="padding: 28px; margin-bottom: 36px; border-left: 6px solid var(--primary);">
-            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
-                <div>
-                    <span class="badge badge-primary" style="margin-bottom: 8px;">CONTINUE LEARNING</span>
-                    <h2 style="font-size: 1.5rem; margin-bottom: 6px;">
-                        <?= Sanitizer::e($continueCourse['title']) ?>
-                    </h2>
-                    <div style="font-size: 13px; color: var(--muted);">
-                        Current lesson: <strong><?= Sanitizer::e($continueCourse['last_lesson_title'] ?? 'Lesson 1') ?></strong> &bull;
-                        <?= (int)$continueCourse['completed_lessons'] ?> of <?= (int)$continueCourse['total_lessons'] ?> lessons completed (<?= number_format((float)$continueCourse['progress_percent'], 0) ?>%)
-                    </div>
-                </div>
-
-                <a href="<?= baseUrl('learning.php?course_id=' . $continueCourse['course_id'] . (!empty($continueCourse['last_lesson_id']) ? '&lesson_id=' . $continueCourse['last_lesson_id'] : '')) ?>" class="btn btn-primary btn-lg">
-                    <i class="bi bi-play-circle-fill"></i> Resume Lesson
+        <div style="margin-bottom: 44px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-dark); margin: 0;">Continue Learning</h2>
+                <a href="<?= baseUrl('learning.php?course_id=' . $continueCourse['course_id']) ?>" style="font-size: 13px; font-weight: 600;">
+                    Reopen Classroom <i class="bi bi-arrow-right"></i>
                 </a>
             </div>
 
-            <div class="course-progress-bar" style="height: 8px; margin-top: 20px;">
-                <div class="course-progress-fill" style="width: <?= (float)$continueCourse['progress_percent'] ?>%;"></div>
+            <div class="continue-learning-card">
+                <div class="continue-thumb">
+                    <?php if (!empty($continueCourse['thumbnail'])): ?>
+                        <img src="<?= baseUrl('assets/images/' . $continueCourse['thumbnail']) ?>" alt="Thumbnail" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&q=80';">
+                    <?php else: ?>
+                        <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #1E293B; color: #94A3B8;">
+                            <i class="bi bi-play-circle" style="font-size: 2rem;"></i>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <div>
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                        <span class="badge badge-primary">IN PROGRESS</span>
+                        <span style="font-size: 12px; color: var(--text-muted);">&bull;</span>
+                        <span style="font-size: 12px; color: var(--text-muted);"><?= (int)$continueCourse['completed_lessons'] ?> / <?= (int)$continueCourse['total_lessons'] ?> Lessons</span>
+                    </div>
+                    
+                    <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; line-height: 1.3;">
+                        <?= Sanitizer::e($continueCourse['title']) ?>
+                    </h3>
+                    
+                    <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 14px;">
+                        Last lesson: <strong style="color: var(--text-dark);"><?= Sanitizer::e($continueCourse['last_lesson_title'] ?? 'Lesson 1') ?></strong>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div class="progress-bar" style="flex: 1; height: 8px;">
+                            <div class="progress-fill" style="width: <?= (float)$continueCourse['progress_percent'] ?>%;"></div>
+                        </div>
+                        <span style="font-size: 13px; font-weight: 700; color: var(--text-dark);"><?= number_format((float)$continueCourse['progress_percent'], 0) ?>%</span>
+                    </div>
+                </div>
+
+                <div>
+                    <a href="<?= baseUrl('learning.php?course_id=' . $continueCourse['course_id'] . (!empty($continueCourse['last_lesson_id']) ? '&lesson_id=' . $continueCourse['last_lesson_id'] : '')) ?>" class="btn btn-primary btn-lg" style="box-shadow: 0 4px 14px rgba(37,99,235,0.3);">
+                        <i class="bi bi-play-fill"></i> Continue Learning
+                    </a>
+                </div>
             </div>
         </div>
     <?php endif; ?>
 
-    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 36px;">
-        <!-- Left Main Column -->
+    <!-- Main Content Columns -->
+    <div class="dashboard-layout">
+        <!-- Left Main Column: My Courses -->
         <div>
-            <!-- Enrolled Courses -->
-            <div style="margin-bottom: 40px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                    <h3 style="font-size: 1.4rem;">My Enrolled Courses</h3>
-                    <a href="<?= baseUrl('courses.php') ?>" class="btn btn-outline btn-sm">
-                        <i class="bi bi-plus-circle"></i> Browse More
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-dark); margin: 0;">My Enrolled Courses</h2>
+                <a href="<?= baseUrl('courses.php') ?>" class="btn btn-outline btn-sm">
+                    <i class="bi bi-plus"></i> Browse Catalog
+                </a>
+            </div>
+
+            <?php if (empty($enrollments)): ?>
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-collection-play"></i>
+                    </div>
+                    <div class="empty-state-title">Your learning journey starts here</div>
+                    <div class="empty-state-desc">
+                        Explore our structured technical courses without recommendation feeds or distractions.
+                    </div>
+                    <a href="<?= baseUrl('courses.php') ?>" class="btn btn-primary">
+                        <i class="bi bi-compass"></i> Explore Courses
                     </a>
                 </div>
+            <?php else: ?>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <?php foreach ($enrollments as $e): ?>
+                        <div class="card card-hover" style="padding: 20px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+                                <div style="flex: 1; min-width: 260px;">
+                                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                        <span class="badge <?= ((float)$e['progress_percent'] >= 100.0) ? 'badge-success' : 'badge-neutral' ?>">
+                                            <?= ((float)$e['progress_percent'] >= 100.0) ? 'COMPLETED' : 'IN PROGRESS' ?>
+                                        </span>
+                                        <span style="font-size: 12px; color: var(--text-muted);">&bull;</span>
+                                        <span style="font-size: 12px; color: var(--text-muted);"><?= (int)$e['completed_lessons'] ?> of <?= (int)$e['total_lessons'] ?> lessons</span>
+                                    </div>
 
-                <?php if (empty($enrollments)): ?>
-                    <div style="text-align: center; padding: 48px 24px; background: #FFFFFF; border: 1px dashed var(--border-color); border-radius: var(--radius-lg);">
-                        <i class="bi bi-collection-play" style="font-size: 40px; color: var(--muted-light); margin-bottom: 12px; display: block;"></i>
-                        <h4 style="margin-bottom: 6px;">You haven't enrolled in any courses yet</h4>
-                        <p style="font-size: 14px; color: var(--muted); margin-bottom: 16px;">
-                            Explore our curated technical curriculum and start watching distraction-free lessons.
-                        </p>
-                        <a href="<?= baseUrl('courses.php') ?>" class="btn btn-primary btn-sm">
-                            Explore Technical Catalog
-                        </a>
-                    </div>
-                <?php else: ?>
-                    <div style="display: flex; flex-direction: column; gap: 16px;">
-                        <?php foreach ($enrollments as $e): ?>
-                            <div class="card" style="padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px;">
-                                <div style="flex: 1;">
-                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
-                                        <h4 style="margin: 0; font-size: 1.1rem;">
-                                            <a href="<?= baseUrl('learning.php?course_id=' . $e['course_id']) ?>" style="color: var(--dark);">
-                                                <?= Sanitizer::e($e['title']) ?>
-                                            </a>
-                                        </h4>
-                                        <?php if ((float)$e['progress_percent'] >= 100.0): ?>
-                                            <span class="badge badge-success"><i class="bi bi-check-all"></i> Completed</span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div style="font-size: 13px; color: var(--muted); margin-bottom: 10px;">
-                                        <?= (int)$e['completed_lessons'] ?> of <?= (int)$e['total_lessons'] ?> lessons &bull; Last studied <?= Sanitizer::timeAgo($e['last_accessed_at']) ?>
-                                    </div>
-                                    <div class="course-progress-bar" style="max-width: 320px;">
-                                        <div class="course-progress-fill" style="width: <?= (float)$e['progress_percent'] ?>%;"></div>
+                                    <h3 style="font-size: 1.15rem; font-weight: 700; margin-bottom: 8px;">
+                                        <a href="<?= baseUrl('learning.php?course_id=' . $e['course_id']) ?>" style="color: var(--text-dark);">
+                                            <?= Sanitizer::e($e['title']) ?>
+                                        </a>
+                                    </h3>
+
+                                    <div style="display: flex; align-items: center; gap: 12px; max-width: 380px;">
+                                        <div class="progress-bar" style="flex: 1; height: 6px;">
+                                            <div class="progress-fill" style="width: <?= (float)$e['progress_percent'] ?>%;"></div>
+                                        </div>
+                                        <span style="font-size: 12px; font-weight: 700; color: var(--text-muted);"><?= number_format((float)$e['progress_percent'], 0) ?>%</span>
                                     </div>
                                 </div>
 
-                                <div style="display: flex; gap: 8px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
                                     <a href="<?= baseUrl('learning.php?course_id=' . $e['course_id']) ?>" class="btn btn-primary btn-sm">
-                                        <i class="bi bi-play-circle"></i> Learn
+                                        <i class="bi bi-play-circle-fill"></i> Learn
                                     </a>
                                     <?php if ((float)$e['progress_percent'] >= 100.0): ?>
-                                        <a href="<?= baseUrl('assessment.php?course_id=' . $e['course_id']) ?>" class="btn btn-outline-primary btn-sm">
-                                            <i class="bi bi-patch-question"></i> Assessment
+                                        <a href="<?= baseUrl('assessment.php?course_id=' . $e['course_id']) ?>" class="btn btn-secondary btn-sm">
+                                            <i class="bi bi-patch-question-fill"></i> Assessment
                                         </a>
                                     <?php endif; ?>
                                 </div>
                             </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- Bookmarked Lessons -->
-            <?php if (!empty($bookmarks)): ?>
-                <div style="margin-bottom: 40px;">
-                    <h3 style="font-size: 1.4rem; margin-bottom: 20px;">Bookmarked Lessons</h3>
-                    <div class="card">
-                        <?php foreach ($bookmarks as $bm): ?>
-                            <div style="padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
-                                <div>
-                                    <div style="font-weight: 600; font-size: 14px; color: var(--dark);">
-                                        <?= Sanitizer::e($bm['lesson_title']) ?>
-                                    </div>
-                                    <div style="font-size: 12px; color: var(--muted);">Course: <?= Sanitizer::e($bm['course_title']) ?></div>
-                                </div>
-                                <a href="<?= baseUrl('learning.php?course_id=' . $bm['course_id'] . '&lesson_id=' . $bm['lesson_id']) ?>" class="btn btn-outline btn-sm">
-                                    <i class="bi bi-play"></i> Watch
-                                </a>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
+                        </div>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
 
-            <!-- Recommended Courses -->
+            <!-- Recommended Next Courses -->
             <?php if (!empty($recommendedCourses)): ?>
-                <div>
-                    <h3 style="font-size: 1.4rem; margin-bottom: 20px;">Recommended for You</h3>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                <div style="margin-top: 48px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                        <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--text-dark); margin: 0;">Recommended For You</h2>
+                        <a href="<?= baseUrl('courses.php') ?>" style="font-size: 13px; font-weight: 600;">View All</a>
+                    </div>
+
+                    <div class="grid grid-2">
                         <?php foreach (array_slice($recommendedCourses, 0, 2) as $rc): ?>
                             <div class="course-card">
-                                <div class="course-body">
-                                    <span class="badge badge-primary" style="margin-bottom: 6px;"><?= ucfirst(Sanitizer::e($rc['difficulty'])) ?></span>
-                                    <h4 class="course-title" style="font-size: 1rem;">
-                                        <a href="<?= baseUrl('course-details.php?slug=' . urlencode($rc['slug'])) ?>">
-                                            <?= Sanitizer::e($rc['title']) ?>
-                                        </a>
-                                    </h4>
-                                    <p class="course-desc" style="font-size: 12px;"><?= Sanitizer::e($rc['short_desc']) ?></p>
-                                    <a href="<?= baseUrl('course-details.php?slug=' . urlencode($rc['slug'])) ?>" class="btn btn-outline btn-sm" style="margin-top: 10px;">
-                                        View Syllabus
-                                    </a>
+                                <div class="course-thumbnail-wrap">
+                                    <?php if (!empty($rc['thumbnail'])): ?>
+                                        <img src="<?= baseUrl('assets/images/' . $rc['thumbnail']) ?>" alt="Thumbnail" class="course-thumbnail-img" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&q=80';">
+                                    <?php else: ?>
+                                        <div style="width:100%; height:100%; background:#1E293B; display:flex; align-items:center; justify-content:center; color:#94A3B8;">
+                                            <i class="bi bi-play-circle" style="font-size:2rem;"></i>
+                                        </div>
+                                    <?php endif; ?>
+                                    <span class="badge badge-primary course-difficulty-badge"><?= ucfirst($rc['difficulty'] ?? 'Beginner') ?></span>
+                                </div>
+                                <div class="course-card-content">
+                                    <div class="course-card-category"><?= Sanitizer::e($rc['category_name'] ?? 'General') ?></div>
+                                    <h4 class="course-card-title"><?= Sanitizer::e($rc['title']) ?></h4>
+                                    <p class="course-card-desc"><?= Sanitizer::e($rc['short_desc']) ?></p>
+                                    <div class="course-card-meta">
+                                        <div class="course-meta-item"><i class="bi bi-collection-play"></i> <?= (int)$rc['lesson_count'] ?> Lessons</div>
+                                        <a href="<?= baseUrl('course-details.php?slug=' . $rc['slug']) ?>" class="btn btn-outline btn-sm">Details</a>
+                                    </div>
                                 </div>
                             </div>
                         <?php endforeach; ?>
@@ -206,93 +301,104 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
             <?php endif; ?>
         </div>
 
-        <!-- Right Sidebar: Badges, Certificates, Notes -->
-        <div>
-            <!-- Earned Certificates -->
-            <div class="card" style="padding: 24px; margin-bottom: 28px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                    <h4 style="margin: 0; font-size: 15px;"><i class="bi bi-award-fill" style="color: var(--success);"></i> Verified Certificates</h4>
-                    <span class="badge badge-success"><?= count($certificates) ?></span>
+        <!-- Right Side: Achievements, Bookmarks & Notes -->
+        <div style="display: flex; flex-direction: column; gap: 28px;">
+            <!-- Achievements & Certs Summary Card -->
+            <div class="card" style="padding: 22px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0;">My Achievements</h3>
+                    <a href="<?= baseUrl('certificates.php') ?>" style="font-size: 12px; font-weight: 600;">View All</a>
                 </div>
 
-                <?php if (empty($certificates)): ?>
-                    <p style="font-size: 13px; color: var(--muted); margin: 0;">
-                        No certificates earned yet. Complete all lessons of a course and pass the final assessment with 70%+ to earn your certificate.
-                    </p>
-                <?php else: ?>
-                    <div style="display: flex; flex-direction: column; gap: 12px;">
-                        <?php foreach ($certificates as $cert): ?>
-                            <div style="background: #F8FAFC; border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 12px;">
-                                <div style="font-weight: 600; font-size: 13px; color: var(--dark); margin-bottom: 2px;">
-                                    <?= Sanitizer::e($cert['course_title']) ?>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <?php if (empty($certificates) && empty($achievements)): ?>
+                        <div style="text-align: center; padding: 20px 10px; color: var(--text-muted); font-size: 13px;">
+                            <i class="bi bi-award" style="font-size: 1.8rem; display: block; margin-bottom: 6px; opacity: 0.5;"></i>
+                            Pass your course assessments to earn certificates and badges.
+                        </div>
+                    <?php else: ?>
+                        <?php foreach (array_slice($certificates, 0, 2) as $cert): ?>
+                            <div style="background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 36px; height: 36px; background: #DCFCE7; color: #16A34A; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                                    <i class="bi bi-award-fill"></i>
                                 </div>
-                                <div style="font-size: 11px; color: var(--muted); margin-bottom: 8px;">
-                                    Score: <strong><?= number_format((float)$cert['score_percentage'], 1) ?>%</strong> &bull; <?= date('M j, Y', strtotime($cert['issued_at'])) ?>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-weight: 700; font-size: 13px; color: var(--text-dark); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= Sanitizer::e($cert['course_title']) ?></div>
+                                    <div style="font-size: 11px; color: var(--text-muted);">Verified Certificate &bull; Score: <?= number_format((float)$cert['score_percentage'], 0) ?>%</div>
                                 </div>
-                                <a href="<?= baseUrl('certificates.php?view=' . urlencode($cert['verification_code'])) ?>" target="_blank" class="btn btn-outline btn-sm" style="font-size: 11px; padding: 4px 10px;">
-                                    <i class="bi bi-printer"></i> View / Print
-                                </a>
                             </div>
                         <?php endforeach; ?>
-                    </div>
-                <?php endif; ?>
-            </div>
 
-            <!-- Performance Badges Gallery -->
-            <div id="badges" class="card" style="padding: 24px; margin-bottom: 28px;">
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                    <h4 style="margin: 0; font-size: 15px;"><i class="bi bi-patch-check-fill" style="color: var(--secondary);"></i> Performance Badges</h4>
-                    <span class="badge badge-secondary"><?= count($achievements) ?></span>
-                </div>
-
-                <?php if (empty($achievements)): ?>
-                    <p style="font-size: 13px; color: var(--muted); margin: 0;">
-                        Earned when you score between 40% and 69.99% on course assessments.
-                    </p>
-                <?php else: ?>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <?php foreach ($achievements as $ach): ?>
-                            <div style="display: flex; align-items: center; gap: 12px; padding: 10px; background: #F8FAFC; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
-                                <div style="font-size: 24px;">
-                                    <?php if ($ach['badge_tier'] === 'silver'): ?>
-                                        🥈
-                                    <?php elseif ($ach['badge_tier'] === 'bronze'): ?>
-                                        🥉
-                                    <?php else: ?>
-                                        🎖️
-                                    <?php endif; ?>
+                        <?php foreach (array_slice($achievements, 0, 2) as $ach): ?>
+                            <div style="background: var(--bg-main); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 12px; display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 36px; height: 36px; background: #FEF3C7; color: #D97706; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0;">
+                                    <i class="bi bi-shield-fill-check"></i>
                                 </div>
-                                <div>
-                                    <div style="font-weight: 700; font-size: 13px;"><?= Sanitizer::e($ach['badge_title']) ?></div>
-                                    <div style="font-size: 11px; color: var(--muted);"><?= Sanitizer::e($ach['course_title']) ?> (<?= number_format((float)$ach['score_percentage'], 1) ?>%)</div>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-weight: 700; font-size: 13px; color: var(--text-dark);"><?= Sanitizer::e($ach['badge_title']) ?></div>
+                                    <div style="font-size: 11px; color: var(--text-muted);"><?= Sanitizer::e($ach['course_title']) ?> (<?= number_format((float)$ach['score_achieved'], 0) ?>%)</div>
                                 </div>
                             </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Saved Bookmarks -->
+            <div class="card" style="padding: 22px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0;">Bookmarked Lessons</h3>
+                    <a href="<?= baseUrl('bookmarks.php') ?>" style="font-size: 12px; font-weight: 600;">View All (<?= count($bookmarks) ?>)</a>
+                </div>
+
+                <?php if (empty($bookmarks)): ?>
+                    <div style="text-align: center; padding: 18px; color: var(--text-muted); font-size: 13px;">
+                        <i class="bi bi-bookmark" style="font-size: 1.6rem; display: block; margin-bottom: 6px; opacity: 0.5;"></i>
+                        Bookmark key lessons while watching to revise them quickly.
+                    </div>
+                <?php else: ?>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <?php foreach (array_slice($bookmarks, 0, 3) as $bm): ?>
+                            <a href="<?= baseUrl('learning.php?course_id=' . $bm['course_id'] . '&lesson_id=' . $bm['lesson_id']) ?>" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--bg-main); border-radius: var(--radius-md); text-decoration: none; color: var(--text-dark); border: 1px solid var(--border); transition: all var(--transition-fast);">
+                                <i class="bi bi-bookmark-fill" style="color: var(--warning); font-size: 14px;"></i>
+                                <div style="flex: 1; min-width: 0;">
+                                    <div style="font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"><?= Sanitizer::e($bm['lesson_title']) ?></div>
+                                    <div style="font-size: 11px; color: var(--text-muted);"><?= Sanitizer::e($bm['course_title']) ?></div>
+                                </div>
+                            </a>
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
             </div>
 
             <!-- Recent Notes -->
-            <?php if (!empty($recentNotes)): ?>
-                <div class="card" style="padding: 24px;">
-                    <h4 style="margin-bottom: 14px; font-size: 15px;"><i class="bi bi-pencil-square" style="color: var(--primary);"></i> Recent Study Notes</h4>
+            <div class="card" style="padding: 22px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                    <h3 style="font-size: 1.05rem; font-weight: 700; margin: 0;">Recent Study Notes</h3>
+                    <a href="<?= baseUrl('notes.php') ?>" style="font-size: 12px; font-weight: 600;">View All (<?= count($recentNotes) ?>)</a>
+                </div>
+
+                <?php if (empty($recentNotes)): ?>
+                    <div style="text-align: center; padding: 18px; color: var(--text-muted); font-size: 13px;">
+                        <i class="bi bi-journal-text" style="font-size: 1.6rem; display: block; margin-bottom: 6px; opacity: 0.5;"></i>
+                        Your personal lesson notes will autosave and appear here.
+                    </div>
+                <?php else: ?>
                     <div style="display: flex; flex-direction: column; gap: 12px;">
                         <?php foreach ($recentNotes as $n): ?>
-                            <div style="background: #F8FAFC; border-radius: var(--radius-md); padding: 12px; border: 1px solid var(--border-color);">
-                                <div style="font-weight: 600; font-size: 12px; color: var(--dark); margin-bottom: 2px;">
-                                    <?= Sanitizer::e($n['lesson_title']) ?>
+                            <div style="padding: 12px; background: var(--bg-main); border-radius: var(--radius-md); border: 1px solid var(--border);">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+                                    <span style="font-weight: 700; font-size: 12px; color: var(--text-dark);"><?= Sanitizer::e($n['lesson_title']) ?></span>
+                                    <span style="font-size: 10.5px; color: var(--text-light);"><?= Sanitizer::timeAgo($n['updated_at']) ?></span>
                                 </div>
-                                <div style="font-size: 12px; color: var(--muted); max-height: 40px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                    <?= Sanitizer::e(strip_tags($n['content'])) ?>
-                                </div>
-                                <div style="font-size: 11px; color: var(--muted-light); margin-top: 4px;">
-                                    <?= Sanitizer::timeAgo($n['updated_at']) ?>
-                                </div>
+                                <p style="font-size: 12.5px; color: var(--text-muted); line-height: 1.4; margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                    <?= Sanitizer::e($n['content']) ?>
+                                </p>
                             </div>
                         <?php endforeach; ?>
                     </div>
-                </div>
-            <?php endif; ?>
+                <?php endif; ?>
+            </div>
         </div>
     </div>
 </div>

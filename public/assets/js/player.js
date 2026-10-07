@@ -80,7 +80,10 @@ async function savePlaybackPosition(isCompleted = false) {
     if (!courseId || !lessonId) return;
 
     try {
-        await fetch('/api/progress/update.php', {
+        const url = (typeof window.getApiUrl === 'function') 
+            ? window.getApiUrl('api/progress/update.php') 
+            : '/api/progress/update.php';
+        await fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -151,7 +154,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const lessonId = document.getElementById('playerConfig')?.getAttribute('data-lesson-id');
 
             try {
-                const res = await fetch('/api/progress/toggle-bookmark.php', {
+                const bmUrl = (typeof window.getApiUrl === 'function') 
+                    ? window.getApiUrl('api/progress/toggle-bookmark.php') 
+                    : '/api/progress/toggle-bookmark.php';
+                const res = await fetch(bmUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -193,7 +199,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (notesStatus) notesStatus.innerHTML = '<i class="bi bi-arrow-repeat"></i> Saving...';
 
                 try {
-                    const res = await fetch('/api/notes/save.php', {
+                    const noteUrl = (typeof window.getApiUrl === 'function') 
+                        ? window.getApiUrl('api/notes/save.php') 
+                        : '/api/notes/save.php';
+                    const res = await fetch(noteUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

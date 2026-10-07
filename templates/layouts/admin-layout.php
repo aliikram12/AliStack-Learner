@@ -16,10 +16,35 @@ $currentScript = basename($_SERVER['PHP_SELF']);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= isset($pageTitle) ? Sanitizer::e($pageTitle) . ' - AliStack Admin' : 'Admin Panel - AliStack Learner' ?></title>
     <?= Csrf::meta() ?>
+    <script>
+        window.AliStack = {
+            baseUrl: "<?= rtrim(baseUrl(), '/') ?>/",
+            csrfToken: "<?= Csrf::token() ?>"
+        };
+        window.getApiUrl = function(endpoint) {
+            var base = (window.AliStack && window.AliStack.baseUrl) ? window.AliStack.baseUrl : '/';
+            if (!base.endsWith('/')) base += '/';
+            var ep = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+            return base + ep;
+        };
+        window.getCsrfToken = function() {
+            return (window.AliStack && window.AliStack.csrfToken) || (document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '');
+        };
+    </script>
 
+    <!-- Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="<?= assetUrl('css/app.css') ?>">
     <link rel="stylesheet" href="<?= assetUrl('css/admin.css') ?>">
+
+    <!-- GSAP Animation Engine & Lucide Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div class="admin-wrapper">
@@ -92,8 +117,13 @@ $currentScript = basename($_SERVER['PHP_SELF']);
         <div class="admin-content">
             <!-- Topbar -->
             <header class="admin-topbar">
-                <div style="font-weight: 600; font-size: 14px; color: var(--dark);">
-                    <?= Sanitizer::e($pageTitle ?? 'Admin Area') ?>
+                <div style="display: flex; align-items: center; gap: 12px;">
+                    <button type="button" id="adminSidebarToggle" class="btn btn-outline btn-sm admin-mobile-toggle" style="display: none; padding: 6px 10px;" aria-label="Toggle Navigation">
+                        <i class="bi bi-list" style="font-size: 18px;"></i>
+                    </button>
+                    <div style="font-weight: 700; font-size: 15px; color: var(--dark);">
+                        <?= Sanitizer::e($pageTitle ?? 'Admin Area') ?>
+                    </div>
                 </div>
 
                 <div style="display: flex; align-items: center; gap: 16px;">

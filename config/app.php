@@ -51,14 +51,19 @@ if (!function_exists('baseUrl')) {
             $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
             $host = $_SERVER['HTTP_HOST'];
             
-            $scriptName = $_SERVER['SCRIPT_NAME'] ?? '';
-            $baseDir = str_replace('\\', '/', dirname($scriptName));
+            $scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
             
-            // If within /public or subfolders, normalize to /public
-            if (str_contains($baseDir, '/public')) {
-                $baseDir = substr($baseDir, 0, strpos($baseDir, '/public') + 7);
-            } elseif ($baseDir === '/' || $baseDir === '\\' || $baseDir === '.') {
-                $baseDir = '';
+            if (str_contains($scriptName, '/public/')) {
+                $baseDir = substr($scriptName, 0, strpos($scriptName, '/public/') + 7);
+            } elseif (str_ends_with($scriptName, '/public')) {
+                $baseDir = $scriptName;
+            } else {
+                $dir = dirname($scriptName);
+                if ($dir === '/' || $dir === '\\' || $dir === '.' || str_starts_with($scriptName, '/admin/') || str_starts_with($scriptName, '/api/')) {
+                    $baseDir = '';
+                } else {
+                    $baseDir = $dir;
+                }
             }
 
             $base = rtrim($protocol . $host . $baseDir, '/');
