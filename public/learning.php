@@ -34,7 +34,31 @@ if (!$enrollment) {
 // Get all lessons for this course
 $lessons = $courseRepo->getLessons($courseId, true);
 if (empty($lessons)) {
-    die("This course has no published lessons available yet.");
+    $pageTitle = 'Curriculum Coming Soon - ' . ($course['title'] ?? 'Course');
+    require_once dirname(__DIR__) . '/templates/layouts/header.php';
+    ?>
+    <div class="container" style="padding: 96px 20px; text-align: center; max-width: 640px;">
+        <div style="width: 88px; height: 88px; border-radius: 24px; background: linear-gradient(135deg, rgba(37,99,235,0.12), rgba(124,58,237,0.12)); display: flex; align-items: center; justify-content: center; margin: 0 auto 24px; color: var(--primary); font-size: 40px; box-shadow: 0 12px 30px -8px rgba(37,99,235,0.25); border: 1px solid rgba(37,99,235,0.15);">
+            <i class="bi bi-collection-play"></i>
+        </div>
+        <h2 style="font-size: 2rem; font-weight: 800; color: var(--text-dark); margin-bottom: 12px; letter-spacing: -0.02em;">Curriculum Coming Soon</h2>
+        <p style="color: var(--text-muted); font-size: 15.5px; line-height: 1.6; margin-bottom: 32px;">
+            Lessons for <strong style="color: var(--text-dark);"><?= Sanitizer::e($course['title']) ?></strong> are currently being curated and published by our instructors. Check back shortly or explore our active courses!
+        </p>
+        <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+            <a href="<?= baseUrl('courses.php') ?>" class="btn btn-primary btn-lg">
+                <i class="bi bi-grid-fill"></i> Browse Available Courses
+            </a>
+            <?php if (Auth::user() && in_array(Auth::user()['role'] ?? '', ['admin', 'super_admin'], true)): ?>
+                <a href="<?= baseUrl('admin/lessons.php?course_id=' . $courseId) ?>" class="btn btn-secondary btn-lg">
+                    <i class="bi bi-plus-circle"></i> Add Lessons in Admin
+                </a>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php
+    require_once dirname(__DIR__) . '/templates/layouts/footer.php';
+    exit;
 }
 
 // Determine active lesson

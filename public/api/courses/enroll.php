@@ -46,7 +46,18 @@ $notifRepo->create(
     "course"
 );
 
+// If request is from a standard browser form submission, redirect directly to the learning page
+$isAjax = (!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+    || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false)
+    || (!empty($_SERVER['CONTENT_TYPE']) && strpos($_SERVER['CONTENT_TYPE'], 'application/json') !== false);
+
+if (!$isAjax) {
+    header('Location: ' . baseUrl("learning.php?course_id={$courseId}"));
+    exit;
+}
+
 Response::success([
     'course_id' => $courseId,
     'redirect_url' => baseUrl("learning.php?course_id={$courseId}")
 ], 'Successfully enrolled in course');
+

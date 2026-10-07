@@ -69,6 +69,9 @@ $currentScript = basename($_SERVER['PHP_SELF']);
                 <li class="admin-nav-item <?= in_array($currentScript, ['courses.php', 'course-edit.php'], true) ? 'active' : '' ?>">
                     <a href="<?= baseUrl('admin/courses.php') ?>"><i class="bi bi-collection-play"></i> Courses</a>
                 </li>
+                <li class="admin-nav-item <?= ($currentScript === 'categories.php') ? 'active' : '' ?>">
+                    <a href="<?= baseUrl('admin/categories.php') ?>"><i class="bi bi-folder2-open"></i> Categories</a>
+                </li>
                 <li class="admin-nav-item <?= ($currentScript === 'lessons.php') ? 'active' : '' ?>">
                     <a href="<?= baseUrl('admin/lessons.php') ?>"><i class="bi bi-play-circle"></i> Lessons</a>
                 </li>

@@ -17,6 +17,55 @@ class CourseRepository {
         return $stmt->fetchAll();
     }
 
+    public function getAllCategoriesAdmin(): array {
+        $sql = "SELECT cat.*, (SELECT COUNT(*) FROM courses c WHERE c.category_id = cat.id) as course_count 
+                FROM course_categories cat 
+                ORDER BY cat.id ASC";
+        $stmt = $this->db->query($sql);
+        return $stmt->fetchAll();
+    }
+
+    public function getCategoryById(int $id): ?array {
+        $stmt = $this->db->prepare("SELECT * FROM course_categories WHERE id = ? LIMIT 1");
+        $stmt->execute([$id]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    }
+
+    public function createCategory(array $data): int {
+        $stmt = $this->db->prepare("
+            INSERT INTO course_categories (name, slug, description, icon, is_active, created_at)
+            VALUES (?, ?, ?, ?, ?, NOW())
+        ");
+        $stmt->execute([
+            $data['name'],
+            $data['slug'],
+            $data['description'] ?? null,
+            $data['icon'] ?? 'bi-folder2',
+            $data['is_active'] ?? 1
+        ]);
+        return (int)$this->db->lastInsertId();
+    }
+
+    public function updateCategory(int $id, array $data): bool {
+        $fields = [];
+        $params = [];
+        foreach ($data as $key => $val) {
+            $fields[] = "`{$key}` = ?";
+            $params[] = $val;
+        }
+        $params[] = $id;
+        $sql = "UPDATE course_categories SET " . implode(', ', $fields) . " WHERE id = ?";
+        return $this->db->prepare($sql)->execute($params);
+    }
+
+    public function deleteCategory(int $id): bool {
+        // Disassociate courses first
+        $this->db->prepare("UPDATE courses SET category_id = NULL WHERE category_id = ?")->execute([$id]);
+        $stmt = $this->db->prepare("DELETE FROM course_categories WHERE id = ?");
+        return $stmt->execute([$id]);
+    }
+
     public function getAllPublished(?int $categoryId = null, ?string $difficulty = null, ?string $search = null): array {
         $where = ["c.status = 'published'"];
         $params = [];
