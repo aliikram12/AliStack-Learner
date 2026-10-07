@@ -49,11 +49,12 @@ $pageDesc = 'Collaborate with peers, ask questions, share insights, and discuss 
 require_once dirname(__DIR__) . '/templates/layouts/header.php';
 ?>
 
-<div style="background: #FFFFFF; border-bottom: 1px solid var(--border-color); padding: 48px 0;">
-    <div class="container">
+<div style="background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%); border-bottom: 1px solid var(--border-color); padding: 52px 0; position: relative; overflow: hidden;">
+    <div style="position: absolute; top: -60px; right: -60px; width: 320px; height: 320px; background: radial-gradient(circle, rgba(37,99,235,0.08) 0%, transparent 70%); border-radius: 50%; pointer-events: none;"></div>
+    <div class="container" style="position: relative; z-index: 1;">
         <!-- Breadcrumb -->
         <div style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin-bottom: 16px;">
-            <a href="<?= baseUrl('dashboard.php') ?>" style="color: var(--muted); text-decoration: none;">Dashboard</a>
+            <a href="<?= baseUrl('dashboard.php') ?>" style="color: var(--muted); text-decoration: none;"><i class="bi bi-house"></i> Dashboard</a>
             <span>/</span>
             <?php if ($selectedGroup): ?>
                 <a href="<?= baseUrl('community.php') ?>" style="color: var(--muted); text-decoration: none;">Community</a>
@@ -70,31 +71,37 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
             <?php endif; ?>
         </div>
 
-        <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 16px;">
+        <div style="display: flex; align-items: flex-end; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
             <div>
                 <?php if ($selectedGroup): ?>
-                    <h1 style="font-size: clamp(1.8rem, 3vw, 2.35rem); font-weight: 800; color: var(--dark); margin: 0 0 8px;">
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: rgba(37,99,235,0.08); border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+                        <i class="bi bi-people-fill"></i> Community Hub
+                    </div>
+                    <h1 style="font-size: clamp(1.8rem, 3vw, 2.35rem); font-weight: 800; color: var(--dark); margin: 0 0 10px; letter-spacing: -0.02em;">
                         <?= Sanitizer::e($selectedGroup['name']) ?>
                     </h1>
-                    <div style="display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--muted);">
-                        <?= $selectedGroup['is_private'] ? '<span class="badge badge-warning"><i class="bi bi-lock-fill"></i> Private Group</span>' : '<span class="badge badge-success"><i class="bi bi-globe"></i> Public Group</span>' ?>
+                    <div style="display: flex; align-items: center; gap: 14px; font-size: 13.5px; color: var(--muted); flex-wrap: wrap;">
+                        <?= $selectedGroup['is_private'] ? '<span class="badge badge-warning" style="padding: 4px 10px; font-weight: 700;"><i class="bi bi-lock-fill"></i> Private Group</span>' : '<span class="badge badge-success" style="padding: 4px 10px; font-weight: 700;"><i class="bi bi-globe"></i> Public Group</span>' ?>
                         <span>&bull;</span>
-                        <span><i class="bi bi-people"></i> <?= (int)$selectedGroup['member_count'] ?> Members</span>
+                        <span><i class="bi bi-people-fill" style="color: var(--primary);"></i> <?= (int)$selectedGroup['member_count'] ?> Active Members</span>
                         <span>&bull;</span>
-                        <span><i class="bi bi-chat-square-text"></i> <?= (int)$selectedGroup['post_count'] ?> Discussions</span>
+                        <span><i class="bi bi-chat-square-text-fill" style="color: #7C3AED;"></i> <?= (int)$selectedGroup['post_count'] ?> Discussions</span>
                     </div>
                 <?php else: ?>
-                    <h1 style="font-size: clamp(1.8rem, 3vw, 2.35rem); font-weight: 800; color: var(--dark); margin: 0 0 8px;">
+                    <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; background: rgba(37,99,235,0.08); border-radius: 999px; font-size: 12px; font-weight: 700; color: var(--primary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+                        <i class="bi bi-chat-dots-fill"></i> Peer Collaboration
+                    </div>
+                    <h1 style="font-size: clamp(2rem, 3.2vw, 2.5rem); font-weight: 800; color: var(--dark); margin: 0 0 10px; letter-spacing: -0.02em;">
                         Learning Community
                     </h1>
-                    <p style="color: var(--muted); font-size: 15px; margin: 0;">
-                        Learn together, ask questions, share project breakthroughs, and discuss courses in moderated spaces.
+                    <p style="color: var(--muted); font-size: 15.5px; margin: 0; max-width: 680px; line-height: 1.6;">
+                        Learn alongside peers, ask questions, share project breakthroughs, and discuss code in supportive, moderated spaces.
                     </p>
                 <?php endif; ?>
             </div>
 
             <?php if ($selectedGroup && $membership && $membership['status'] === 'active' && !$selectedPost): ?>
-                <button type="button" class="btn btn-primary" onclick="window.AliModal?.open('newPostModal')">
+                <button type="button" class="btn btn-primary" onclick="window.AliModal?.open('newPostModal')" style="box-shadow: 0 4px 14px rgba(37,99,235,0.3); font-weight: 700;">
                     <i class="bi bi-plus-lg"></i> Start New Discussion
                 </button>
             <?php endif; ?>
@@ -109,21 +116,46 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
             <?php foreach ($groups as $g): 
                 $userMemb = $currentUserId ? $communityRepo->getUserMembership($currentUserId, (int)$g['id']) : null;
                 $userReq = $currentUserId ? $communityRepo->getUserJoinRequest($currentUserId, (int)$g['id']) : null;
+
+                // Dynamic icon and accent theme
+                $icon = 'bi-collection-play';
+                $iconColor = '#2563EB';
+                $iconBg = 'rgba(37,99,235,0.1)';
+                if (str_contains($g['slug'], 'php')) {
+                    $icon = 'bi-database-fill-gear';
+                    $iconColor = '#2563EB';
+                    $iconBg = '#EFF6FF';
+                } elseif (str_contains($g['slug'], 'javascript')) {
+                    $icon = 'bi-braces-asterisk';
+                    $iconColor = '#D97706';
+                    $iconBg = '#FEF3C7';
+                } elseif (str_contains($g['slug'], 'ai')) {
+                    $icon = 'bi-cpu-fill';
+                    $iconColor = '#7C3AED';
+                    $iconBg = '#F5F3FF';
+                } elseif (str_contains($g['slug'], 'web')) {
+                    $icon = 'bi-laptop-fill';
+                    $iconColor = '#059669';
+                    $iconBg = '#ECFDF5';
+                }
             ?>
-                <div class="card" data-animate="fade-up" style="padding: 28px; border: 1px solid var(--border-color); border-radius: var(--radius-xl); box-shadow: var(--shadow-sm); display: flex; flex-direction: column; justify-content: space-between;">
+                <div class="community-card-pro" data-animate="fade-up">
                     <div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px;">
-                            <span class="badge <?= $g['is_private'] ? 'badge-warning' : 'badge-success' ?>">
-                                <i class="bi <?= $g['is_private'] ? 'bi-lock-fill' : 'bi-globe' ?>"></i> 
-                                <?= $g['is_private'] ? 'Private' : 'Public' ?>
-                            </span>
-                            <span style="font-size: 12.5px; font-weight: 600; color: var(--muted);">
-                                <i class="bi bi-people"></i> <?= (int)$g['member_count'] ?> members
-                            </span>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                            <div style="width: 48px; height: 48px; border-radius: 12px; background: <?= $iconBg ?>; color: <?= $iconColor ?>; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 2px 8px rgba(0,0,0,0.04);">
+                                <i class="bi <?= $icon ?>"></i>
+                            </div>
+
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span class="badge <?= $g['is_private'] ? 'badge-warning' : 'badge-success' ?>" style="font-weight: 700; padding: 4px 10px;">
+                                    <i class="bi <?= $g['is_private'] ? 'bi-lock-fill' : 'bi-globe' ?>"></i> 
+                                    <?= $g['is_private'] ? 'Private' : 'Public' ?>
+                                </span>
+                            </div>
                         </div>
 
-                        <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 8px;">
-                            <a href="<?= baseUrl('community.php?group=' . urlencode($g['slug'])) ?>" style="color: var(--dark); text-decoration: none;">
+                        <h3 style="font-size: 1.25rem; font-weight: 800; margin-bottom: 10px; line-height: 1.4;">
+                            <a href="<?= baseUrl('community.php?group=' . urlencode($g['slug'])) ?>" style="color: var(--dark); text-decoration: none; transition: color 0.2s ease;">
                                 <?= Sanitizer::e($g['name']) ?>
                             </a>
                         </h3>
@@ -133,17 +165,20 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
                         </p>
                     </div>
 
-                    <div style="border-top: 1px solid var(--border-color); padding-top: 18px; display: flex; align-items: center; justify-content: space-between;">
-                        <span style="font-size: 12.5px; color: var(--muted);"><i class="bi bi-chat-dots"></i> <?= (int)$g['post_count'] ?> topics</span>
+                    <div style="border-top: 1px solid var(--border-color); padding-top: 20px; display: flex; align-items: center; justify-content: space-between;">
+                        <div style="display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--muted); font-weight: 600;">
+                            <span><i class="bi bi-people-fill" style="color: var(--primary);"></i> <?= (int)$g['member_count'] ?></span>
+                            <span><i class="bi bi-chat-text-fill" style="color: #7C3AED;"></i> <?= (int)$g['post_count'] ?></span>
+                        </div>
                         
                         <?php if ($userMemb && $userMemb['status'] === 'active'): ?>
-                            <a href="<?= baseUrl('community.php?group=' . urlencode($g['slug'])) ?>" class="btn btn-secondary btn-sm">
+                            <a href="<?= baseUrl('community.php?group=' . urlencode($g['slug'])) ?>" class="btn btn-secondary btn-sm" style="font-weight: 600;">
                                 Enter Group &rarr;
                             </a>
                         <?php elseif ($userReq && $userReq['status'] === 'pending'): ?>
-                            <span class="badge badge-warning"><i class="bi bi-hourglass-split"></i> Request Pending</span>
+                            <span class="badge badge-warning" style="font-weight: 600;"><i class="bi bi-hourglass-split"></i> Request Pending</span>
                         <?php else: ?>
-                            <a href="<?= baseUrl('community.php?group=' . urlencode($g['slug'])) ?>" class="btn btn-primary btn-sm">
+                            <a href="<?= baseUrl('community.php?group=' . urlencode($g['slug'])) ?>" class="btn btn-primary btn-sm" style="box-shadow: 0 2px 8px rgba(37,99,235,0.2); font-weight: 600;">
                                 <?= $g['is_private'] ? 'Request Access' : 'View Group' ?> &rarr;
                             </a>
                         <?php endif; ?>

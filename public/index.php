@@ -278,55 +278,65 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
 <!-- 5-Step Learning Pathway -->
 <section style="padding: 96px 0;">
     <div class="container" style="text-align: center;">
-        <div style="display: inline-flex; align-items: center; gap: 6px; background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+        <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(37,99,235,0.08); color: var(--primary); font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 9999px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(37,99,235,0.2);">
             <i class="bi bi-signpost-split-fill"></i> Clear Pathway
         </div>
-        <h2 style="font-size: clamp(1.8rem, 3vw, 2.5rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; color: var(--dark);">
+        <h2 style="font-size: clamp(2rem, 3.5vw, 2.75rem); font-weight: 800; letter-spacing: -0.025em; margin-bottom: 16px; color: var(--dark);">
             How AliStack Learner Works
         </h2>
-        <p style="color: var(--muted); font-size: 16px; max-width: 620px; margin: 0 auto 56px;">
+        <p style="color: var(--muted); font-size: 16px; max-width: 640px; margin: 0 auto 56px; line-height: 1.6;">
             A structured five-stage learning system engineered to turn passive video watching into tangible, provable competence.
         </p>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; text-align: left;">
-            <div class="card" data-animate="fade-up" style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-lg); position: relative;">
-                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: #EFF6FF; color: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; margin-bottom: 18px;">
-                    1
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px; text-align: left;">
+            <!-- Step 1 -->
+            <div class="pathway-card" style="--card-gradient: linear-gradient(90deg, #2563EB, #3B82F6);">
+                <div class="pathway-badge" style="background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%); color: #1D4ED8;">
+                    <i class="bi bi-play-circle-fill"></i>
+                    <span class="pathway-step-num">1</span>
                 </div>
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--dark);">Enroll & Focus</h4>
-                <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0;">Enroll in curated courses. Experience zero distractions inside our clean, tailored player layout.</p>
+                <h4 style="font-size: 17px; font-weight: 800; margin-bottom: 8px; color: var(--dark);">Enroll & Focus</h4>
+                <p style="font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0;">Enroll in curated courses with one click. Experience zero algorithmic distractions in our tailored classroom player.</p>
             </div>
 
-            <div class="card" data-animate="fade-up" style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-lg); position: relative;">
-                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: #F5F3FF; color: var(--secondary); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; margin-bottom: 18px;">
-                    2
+            <!-- Step 2 -->
+            <div class="pathway-card" style="--card-gradient: linear-gradient(90deg, #7C3AED, #9333EA);">
+                <div class="pathway-badge" style="background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%); color: #6D28D9;">
+                    <i class="bi bi-journal-code"></i>
+                    <span class="pathway-step-num">2</span>
                 </div>
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--dark);">Notes & Progress</h4>
-                <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0;">Take timestamped notes autosaved to MySQL. Bookmark tricky lessons and track your exact progress percentage.</p>
+                <h4 style="font-size: 17px; font-weight: 800; margin-bottom: 8px; color: var(--dark);">Notes & Progress</h4>
+                <p style="font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0;">Take timestamped notes autosaved to MySQL. Bookmark tricky lessons and track your exact progress percentage.</p>
             </div>
 
-            <div class="card" data-animate="fade-up" style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-lg); position: relative;">
-                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: #EFF6FF; color: #1D4ED8; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; margin-bottom: 18px;">
-                    3
+            <!-- Step 3 -->
+            <div class="pathway-card" style="--card-gradient: linear-gradient(90deg, #0284C7, #06B6D4);">
+                <div class="pathway-badge" style="background: linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 100%); color: #0284C7;">
+                    <i class="bi bi-robot"></i>
+                    <span class="pathway-step-num">3</span>
                 </div>
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--dark);">Ask AI Tutor</h4>
-                <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0;">Stuck on a syntax error or concept? Open the AliStack AI Tutor anytime. Get explanations in English or Roman Urdu.</p>
+                <h4 style="font-size: 17px; font-weight: 800; margin-bottom: 8px; color: var(--dark);">Ask AI Tutor</h4>
+                <p style="font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0;">Stuck on code or syntax? Open the AliStack AI Tutor anytime. Get contextual explanations in English or Roman Urdu.</p>
             </div>
 
-            <div class="card" data-animate="fade-up" style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-lg); position: relative;">
-                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: #FEF3C7; color: #B45309; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; margin-bottom: 18px;">
-                    4
+            <!-- Step 4 -->
+            <div class="pathway-card" style="--card-gradient: linear-gradient(90deg, #D97706, #F59E0B);">
+                <div class="pathway-badge" style="background: linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 100%); color: #B45309;">
+                    <i class="bi bi-clipboard2-check-fill"></i>
+                    <span class="pathway-step-num">4</span>
                 </div>
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--dark);">Take Assessment</h4>
-                <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0;">Complete required lessons to unlock the course MCQ test. Server-graded with tamper-proof validation.</p>
+                <h4 style="font-size: 17px; font-weight: 800; margin-bottom: 8px; color: var(--dark);">Take Assessment</h4>
+                <p style="font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0;">Complete required lessons to unlock timed course MCQ tests. Server-graded with tamper-proof validation.</p>
             </div>
 
-            <div class="card" data-animate="fade-up" style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-lg); position: relative;">
-                <div style="width: 44px; height: 44px; border-radius: var(--radius-md); background: #DCFCE7; color: #15803D; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.15rem; margin-bottom: 18px;">
-                    5
+            <!-- Step 5 -->
+            <div class="pathway-card" style="--card-gradient: linear-gradient(90deg, #059669, #10B981);">
+                <div class="pathway-badge" style="background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%); color: #047857;">
+                    <i class="bi bi-award-fill"></i>
+                    <span class="pathway-step-num">5</span>
                 </div>
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--dark);">Earn Credentials</h4>
-                <p style="font-size: 13px; color: var(--muted); line-height: 1.6; margin: 0;">Score 70%+ for an AliStack verified Certificate, or 40%-69.99% for Silver, Bronze, or Starter Performance Badges.</p>
+                <h4 style="font-size: 17px; font-weight: 800; margin-bottom: 8px; color: var(--dark);">Earn Credentials</h4>
+                <p style="font-size: 13.5px; color: var(--muted); line-height: 1.6; margin: 0;">Score 70%+ for verified Certificates with unique URLs, or 40%-69.99% for Silver, Bronze, or Starter Performance Badges.</p>
             </div>
         </div>
     </div>
@@ -336,58 +346,77 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
 <section style="padding: 96px 0; background: #FFFFFF; border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color);">
     <div class="container" style="max-width: 960px;">
         <div style="text-align: center; margin-bottom: 48px;">
-            <div style="display: inline-flex; align-items: center; gap: 6px; background: #DCFCE7; color: #15803D; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(22,163,74,0.08); color: #16A34A; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 9999px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(22,163,74,0.2);">
                 <i class="bi bi-shield-check"></i> Standardized Validation
             </div>
-            <h2 style="font-size: clamp(1.8rem, 3vw, 2.25rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; color: var(--dark);">
+            <h2 style="font-size: clamp(2rem, 3.5vw, 2.5rem); font-weight: 800; letter-spacing: -0.025em; margin-bottom: 16px; color: var(--dark);">
                 AliStack Credentialing Matrix
             </h2>
-            <p style="color: var(--muted); font-size: 15px; max-width: 600px; margin: 0 auto;">
+            <p style="color: var(--muted); font-size: 15.5px; max-width: 600px; margin: 0 auto; line-height: 1.6;">
                 Every assessment is scored strictly on our servers. Your verified performance level dictates your earned credentials.
             </p>
         </div>
 
-        <div class="table-card" data-animate="fade-up" style="border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm);">
+        <div class="matrix-container" data-animate="fade-up">
+            <div class="matrix-header-gradient">
+                <div>
+                    <h3 style="font-size: 1.15rem; font-weight: 800; margin: 0; color: #FFFFFF;">Performance Tiers & Criteria</h3>
+                    <p style="font-size: 12.5px; color: rgba(255,255,255,0.7); margin: 2px 0 0;">Cryptographically sealed & verifiable credentials</p>
+                </div>
+                <span class="badge" style="background: rgba(255,255,255,0.15); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.25); font-size: 12px;">
+                    <i class="bi bi-shield-lock-fill"></i> Server Graded
+                </span>
+            </div>
+
             <div class="table-responsive">
-                <table class="data-table">
+                <table class="data-table" style="margin: 0;">
                     <thead>
-                        <tr>
-                            <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">Final Score</th>
-                            <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">Earned Achievement</th>
-                            <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">Credential Type</th>
-                            <th style="padding: 16px 20px; font-size: 12px; font-weight: 700; text-transform: uppercase;">Verification</th>
+                        <tr style="background: #F8FAFC;">
+                            <th style="padding: 16px 24px; font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--dark);">Final Score</th>
+                            <th style="padding: 16px 24px; font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--dark);">Earned Achievement</th>
+                            <th style="padding: 16px 24px; font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--dark);">Credential Type</th>
+                            <th style="padding: 16px 24px; font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--dark);">Verification</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr style="background: #F0FDF4;">
-                            <td style="font-weight: 700; color: #166534; font-size: 15px;">70% – 100%</td>
-                            <td><span style="font-weight: 700; color: #166534;"><i class="bi bi-award-fill"></i> AliStack Course Certificate</span></td>
-                            <td><span class="badge badge-success">Official Certificate</span></td>
-                            <td style="color: #166534; font-size: 13px; font-weight: 500;">Unique Verification URL & ID</td>
+                        <tr style="background: linear-gradient(90deg, rgba(220,252,231,0.5) 0%, rgba(240,253,244,0.2) 100%);">
+                            <td style="padding: 20px 24px; font-weight: 800; color: #15803D; font-size: 16px;">70% – 100%</td>
+                            <td style="padding: 20px 24px;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="width: 28px; height: 28px; border-radius: 50%; background: #22C55E; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 14px;">
+                                        <i class="bi bi-award-fill"></i>
+                                    </div>
+                                    <strong style="color: #15803D; font-size: 15px;">AliStack Course Certificate</strong>
+                                </div>
+                            </td>
+                            <td style="padding: 20px 24px;"><span class="badge badge-success" style="font-weight: 700; padding: 6px 12px;">Official Certificate</span></td>
+                            <td style="padding: 20px 24px; color: #15803D; font-size: 13.5px; font-weight: 600;">
+                                <i class="bi bi-check2-circle"></i> Unique Verification URL & ID
+                            </td>
                         </tr>
                         <tr>
-                            <td style="font-weight: 700; color: var(--dark);">60% – 69.99%</td>
-                            <td><span class="badge badge-tier-silver"><i class="bi bi-patch-check-fill"></i> Silver Proficiency Badge</span></td>
-                            <td style="font-size: 13px; color: var(--muted);">Performance Badge</td>
-                            <td style="font-size: 13px; color: var(--muted);">Recorded on Student Profile</td>
+                            <td style="padding: 18px 24px; font-weight: 700; color: var(--dark); font-size: 15px;">60% – 69.99%</td>
+                            <td style="padding: 18px 24px;"><span class="badge badge-tier-silver" style="padding: 6px 14px; font-size: 12.5px;"><i class="bi bi-patch-check-fill"></i> Silver Proficiency Badge</span></td>
+                            <td style="padding: 18px 24px; font-size: 13.5px; color: var(--muted);">Performance Badge</td>
+                            <td style="padding: 18px 24px; font-size: 13.5px; color: var(--muted);"><i class="bi bi-person-badge"></i> Recorded on Student Profile</td>
                         </tr>
                         <tr>
-                            <td style="font-weight: 700; color: var(--dark);">50% – 59.99%</td>
-                            <td><span class="badge badge-tier-bronze"><i class="bi bi-patch-check-fill"></i> Bronze Competency Badge</span></td>
-                            <td style="font-size: 13px; color: var(--muted);">Performance Badge</td>
-                            <td style="font-size: 13px; color: var(--muted);">Recorded on Student Profile</td>
+                            <td style="padding: 18px 24px; font-weight: 700; color: var(--dark); font-size: 15px;">50% – 59.99%</td>
+                            <td style="padding: 18px 24px;"><span class="badge badge-tier-bronze" style="padding: 6px 14px; font-size: 12.5px;"><i class="bi bi-patch-check-fill"></i> Bronze Competency Badge</span></td>
+                            <td style="padding: 18px 24px; font-size: 13.5px; color: var(--muted);">Performance Badge</td>
+                            <td style="padding: 18px 24px; font-size: 13.5px; color: var(--muted);"><i class="bi bi-person-badge"></i> Recorded on Student Profile</td>
                         </tr>
                         <tr>
-                            <td style="font-weight: 700; color: var(--dark);">40% – 49.99%</td>
-                            <td><span class="badge badge-tier-starter"><i class="bi bi-patch-check-fill"></i> Foundation Starter Badge</span></td>
-                            <td style="font-size: 13px; color: var(--muted);">Performance Badge</td>
-                            <td style="font-size: 13px; color: var(--muted);">Recorded on Student Profile</td>
+                            <td style="padding: 18px 24px; font-weight: 700; color: var(--dark); font-size: 15px;">40% – 49.99%</td>
+                            <td style="padding: 18px 24px;"><span class="badge badge-tier-starter" style="padding: 6px 14px; font-size: 12.5px;"><i class="bi bi-patch-check-fill"></i> Foundation Starter Badge</span></td>
+                            <td style="padding: 18px 24px; font-size: 13.5px; color: var(--muted);">Performance Badge</td>
+                            <td style="padding: 18px 24px; font-size: 13.5px; color: var(--muted);"><i class="bi bi-person-badge"></i> Recorded on Student Profile</td>
                         </tr>
                         <tr>
-                            <td style="color: var(--muted); font-weight: 600;">Below 40%</td>
-                            <td><span style="color: var(--muted); font-style: italic;">No Credential Awarded</span></td>
-                            <td style="font-size: 13px; color: var(--muted);">Revision Guidance</td>
-                            <td style="font-size: 13px; color: var(--muted);">Eligible for Retake (up to limit)</td>
+                            <td style="padding: 18px 24px; color: var(--muted); font-weight: 600;">Below 40%</td>
+                            <td style="padding: 18px 24px;"><span style="color: var(--muted); font-style: italic;">No Credential Awarded</span></td>
+                            <td style="padding: 18px 24px; font-size: 13.5px; color: var(--muted);">Revision Guidance</td>
+                            <td style="padding: 18px 24px; font-size: 13.5px; color: var(--muted);"><i class="bi bi-arrow-repeat"></i> Eligible for Retake (up to limit)</td>
                         </tr>
                     </tbody>
                 </table>
@@ -396,39 +425,78 @@ require_once dirname(__DIR__) . '/templates/layouts/header.php';
     </div>
 </section>
 
-<!-- FAQ Section -->
+<!-- FAQ Section with Interactive Accordion -->
 <section style="padding: 96px 0;">
-    <div class="container" style="max-width: 840px;">
+    <div class="container" style="max-width: 860px;">
         <div style="text-align: center; margin-bottom: 48px;">
-            <div style="display: inline-flex; align-items: center; gap: 6px; background: var(--primary-light); color: var(--primary); font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">
+            <div style="display: inline-flex; align-items: center; gap: 6px; background: rgba(37,99,235,0.08); color: var(--primary); font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 9999px; margin-bottom: 14px; text-transform: uppercase; letter-spacing: 0.5px; border: 1px solid rgba(37,99,235,0.2);">
                 <i class="bi bi-question-circle-fill"></i> Clear Answers
             </div>
-            <h2 style="font-size: clamp(1.8rem, 3vw, 2.25rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; color: var(--dark);">
+            <h2 style="font-size: clamp(2rem, 3.5vw, 2.5rem); font-weight: 800; letter-spacing: -0.025em; margin-bottom: 12px; color: var(--dark);">
                 Frequently Asked Questions
             </h2>
-            <p style="color: var(--muted); font-size: 15px;">Everything you need to know about learning, AI assistance, and certificates on AliStack Learner.</p>
+            <p style="color: var(--muted); font-size: 15.5px; line-height: 1.6;">Everything you need to know about learning, AI assistance, and certificates on AliStack Learner.</p>
         </div>
 
-        <div style="display: flex; flex-direction: column; gap: 16px;">
-            <div class="card" data-animate="fade-up" style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--dark);">Are the video courses downloaded or re-hosted?</h4>
-                <p style="font-size: 14px; margin: 0; color: var(--muted); line-height: 1.6;">No. All courses use the official YouTube IFrame Player API in compliance with YouTube Terms of Service. We do not download, bypass ads, or rehost content.</p>
+        <div class="faq-accordion-group">
+            <div class="faq-accordion-item active">
+                <div class="faq-accordion-header" onclick="toggleFaq(this)">
+                    <span>Are the video courses downloaded or re-hosted?</span>
+                    <div class="faq-accordion-icon"><i class="bi bi-chevron-down"></i></div>
+                </div>
+                <div class="faq-accordion-body">
+                    No. All courses use the official YouTube IFrame Player API in strict compliance with YouTube Terms of Service. We do not download, bypass ads, or rehost content. Instead, AliStack Learner provides a dedicated, focused classroom environment with synchronized notes, progress tracking, and AI tutoring.
+                </div>
             </div>
-            <div class="card" data-animate="fade-up" style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--dark);">How does the AliStack AI Tutor work?</h4>
-                <p style="font-size: 14px; margin: 0; color: var(--muted); line-height: 1.6;">The AI Tutor uses the configured AgentRouter API with secure server-side proxying. It analyzes your active lesson title, overview, and questions to provide relevant guidance in English or Roman Urdu.</p>
+
+            <div class="faq-accordion-item">
+                <div class="faq-accordion-header" onclick="toggleFaq(this)">
+                    <span>How does the AliStack AI Tutor work?</span>
+                    <div class="faq-accordion-icon"><i class="bi bi-chevron-down"></i></div>
+                </div>
+                <div class="faq-accordion-body">
+                    The AI Tutor uses the configured AgentRouter API with secure server-side proxying. It analyzes your active lesson title, outline, and questions to provide relevant guidance in English or Roman Urdu, without exposing private server credentials to the browser.
+                </div>
             </div>
-            <div class="card" data-animate="fade-up" style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--dark);">Can anyone verify my certificate?</h4>
-                <p style="font-size: 14px; margin: 0; color: var(--muted); line-height: 1.6;">Yes. Every certificate issued includes a unique verification code and public URL. Employers and peers can verify certificate authenticity anytime at our Certificate Verification page.</p>
+
+            <div class="faq-accordion-item">
+                <div class="faq-accordion-header" onclick="toggleFaq(this)">
+                    <span>Can anyone verify my certificate?</span>
+                    <div class="faq-accordion-icon"><i class="bi bi-chevron-down"></i></div>
+                </div>
+                <div class="faq-accordion-body">
+                    Yes. Every certificate issued includes a unique verification code and public URL. Employers and peers can verify certificate authenticity anytime at our Certificate Verification page.
+                </div>
             </div>
-            <div class="card" data-animate="fade-up" style="padding: 24px; border: 1px solid var(--border-color); border-radius: var(--radius-lg);">
-                <h4 style="font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--dark);">What if I don't achieve 70% on the assessment?</h4>
-                <p style="font-size: 14px; margin: 0; color: var(--muted); line-height: 1.6;">If you score between 40% and 69.99%, you automatically receive a verified performance badge (Silver, Bronze, or Starter) recognizing your foundation. You are also eligible to revise lessons and retake the assessment.</p>
+
+            <div class="faq-accordion-item">
+                <div class="faq-accordion-header" onclick="toggleFaq(this)">
+                    <span>What if I don't achieve 70% on the assessment?</span>
+                    <div class="faq-accordion-icon"><i class="bi bi-chevron-down"></i></div>
+                </div>
+                <div class="faq-accordion-body">
+                    If you score between 40% and 69.99%, you automatically receive a verified performance badge (Silver, Bronze, or Starter) recognizing your foundation. You are also eligible to revise lessons and retake the assessment.
+                </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+function toggleFaq(headerEl) {
+    var item = headerEl.parentElement;
+    var wasActive = item.classList.contains('active');
+    
+    // Close other accordion items
+    document.querySelectorAll('.faq-accordion-item').forEach(function(el) {
+        el.classList.remove('active');
+    });
+
+    if (!wasActive) {
+        item.classList.add('active');
+    }
+}
+</script>
 
 <!-- Call-to-Action Banner -->
 <section style="padding: 80px 0; background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 50%, #7C3AED 100%); color: #FFFFFF; text-align: center; position: relative; overflow: hidden;">

@@ -1423,3 +1423,216 @@ img {
         scroll-behavior: auto !important;
     }
 }
+
+/* ==========================================================================
+   Premium UI & Aesthetics Enhancements (AliStack Learner 2.0)
+   ========================================================================== */
+
+/* 5-Step Pathway Card */
+.pathway-card {
+    background: #FFFFFF;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    border-radius: 20px;
+    padding: 30px 24px 28px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 16px -2px rgba(15, 23, 42, 0.04), 0 2px 6px -1px rgba(15, 23, 42, 0.02);
+    display: flex;
+    flex-direction: column;
+}
+
+.pathway-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--card-gradient, linear-gradient(90deg, #2563EB, #7C3AED));
+    opacity: 0.9;
+}
+
+.pathway-card:hover {
+    transform: translateY(-7px);
+    border-color: rgba(37, 99, 235, 0.3);
+    box-shadow: 0 22px 35px -8px rgba(37, 99, 235, 0.12), 0 8px 16px -4px rgba(15, 23, 42, 0.04);
+}
+
+.pathway-badge {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 18px -4px rgba(0, 0, 0, 0.12);
+    position: relative;
+}
+
+.pathway-step-num {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #0F172A;
+    color: #FFFFFF;
+    font-size: 11px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #FFFFFF;
+}
+
+/* Modern FAQ Accordion */
+.faq-accordion-item {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 16px;
+    margin-bottom: 14px;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+.faq-accordion-item:hover {
+    border-color: #CBD5E1;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.06);
+}
+
+.faq-accordion-item.active {
+    border-color: var(--primary);
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.1);
+}
+
+.faq-accordion-header {
+    padding: 22px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+    font-size: 16px;
+    font-weight: 700;
+    color: #0F172A;
+    gap: 16px;
+}
+
+.faq-accordion-header:hover {
+    color: var(--primary);
+}
+
+.faq-accordion-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--bg-subtle);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--muted);
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background 0.2s, color 0.2s;
+    flex-shrink: 0;
+}
+
+.faq-accordion-item.active .faq-accordion-icon {
+    transform: rotate(180deg);
+    background: var(--primary);
+    color: #FFFFFF;
+}
+
+.faq-accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), padding 0.3s ease;
+    padding: 0 24px;
+    color: #475569;
+    font-size: 14.5px;
+    line-height: 1.7;
+}
+
+.faq-accordion-item.active .faq-accordion-body {
+    max-height: 300px;
+    padding: 0 24px 22px;
+}
+
+/* Credentialing Matrix Table Enhancements */
+.matrix-container {
+    background: #FFFFFF;
+    border-radius: 20px;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06);
+    overflow: hidden;
+}
+
+.matrix-header-gradient {
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+    color: #FFFFFF;
+    padding: 24px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* Community Group Cards */
+.community-card-pro {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 20px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.community-card-pro::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--group-accent, linear-gradient(90deg, #2563EB, #7C3AED));
+}
+
+.community-card-pro:hover {
+    transform: translateY(-6px);
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 20px 35px -8px rgba(37, 99, 235, 0.12);
+}
+
+.avatar-stack {
+    display: flex;
+    align-items: center;
+}
+
+.avatar-stack-item {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid #FFFFFF;
+    margin-left: -8px;
+    background: linear-gradient(135deg, #64748B, #334155);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.avatar-stack-item:first-child {
+    margin-left: 0;
+}
+
